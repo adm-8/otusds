@@ -1,0 +1,41 @@
+apt-get update
+apt-get install mc
+apt-get install vsftpd
+
+создаем папку для пользователя
+
+mkdir /home/www
+adduser --home /home/www www
+
+anon_enable = no
+local_enable = yes
+write_enable = yes
+local_umask = 022
+chown = yes
+
+apt-get install mysql-server mysql-client libmysqlclient15-dev
+
+apt-get install libapache2-mod-php5 libapache2-mod-ruby php5 php5-common php5-curl php5-dev php5-gd php5-idn php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-mhash php5-ming php5-mysql php5-pspell php5-recode php5-snmp php5-sqlite php5-tidy php5-xmlrpc php5-xsl
+
+
+CREATE USER 'site'@'localhost' IDENTIFIED BY 'hexr@53';
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'ksbmar9@';
+CREATE USER 'orlog'@'%' IDENTIFIED BY 'htlmrf82';
+GRANT ALL PRIVILEGES ON *.* TO 'orlog'@'%';
+CREATE DATABASE WebSite;
+
+mysqldump -uorlog -h5.63.158.226 -p WebSite --routines --extended-insert > /home/dump.sql
+mysql -uroot -p WebSite < /home/dump.sql
+
+включаем sudo a2enmod rewrite
+
+содержимое .htaccess:
+
+RewriteEngine On
+Options +FollowSymLinks
+AddDefaultCharset utf-8
+ErrorDocument 404 /404.html
+RewriteRule ^([^/]*)\.html$ /index.php?content=$1 [L]
+RewriteCond %{HTTP_HOST} ^domain\.ru$ [NC]
+RewriteRule ^(.*)$ http://www.domain.ru/$1 [R=301,L]
+RewriteRule ^(Sitemap)\.xml /sitemap.xml [L]
